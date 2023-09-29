@@ -1,0 +1,101 @@
+You are given an n x m binary matrix grid, where 0 represents a sea cell and 1 represents a land cell.
+
+A move consists of walking from one land cell to another adjacent (4-directionally) land cell or walking off the boundary of the grid.
+
+Find the number of land cells in grid for which we cannot walk off the boundary of the grid in any number of moves.
+
+Example 1:
+
+Input:
+grid[][] = {{0, 0, 0, 0},
+            {1, 0, 1, 0},
+            {0, 1, 1, 0},
+            {0, 0, 0, 0}}
+Output:
+3
+Explanation:
+0 0 0 0
+1 0 1 0
+0 1 1 0
+0 0 0 0
+The highlighted cells represents the land cells.
+Example 2:
+
+Input:
+grid[][] = {{0, 0, 0, 1},
+            {0, 1, 1, 0},
+            {0, 1, 1, 0},
+            {0, 0, 0, 1},
+            {0, 1, 1, 0}}
+Output:
+4
+Explanation:
+0 0 0 1
+0 1 1 0
+0 1 1 0
+0 0 0 1
+0 1 1 0
+The highlighted cells represents the land cells.
+Your Task:
+
+You don't need to print or input anything. Complete the function numberOfEnclaves() which takes a 2D integer matrix grid as the input parameter and returns an integer, denoting the number of land cells.
+
+Expected Time Complexity: O(n * m)
+
+Expected Space Complexity: O(n * m)
+
+Constraints:
+
+1 <= n, m <= 500
+grid[i][j] == 0 or 1
+
+
+Sol:
+Optimized Code
+
+from typing import List
+from collections import deque
+
+class Solution:    
+    def numberOfEnclaves(self, grid: List[List[int]]) -> int:
+        # Define the possible neighbor directions
+        neighbors = [[0, -1], [-1, 0], [1, 0], [0, 1]]
+        
+        # Get the dimensions of the grid
+        rows, cols = len(grid), len(grid[0])
+        
+        # Initialize a deque to store boundary points
+        boundary = deque()
+        
+        # Initialize a counter for the number of enclaves
+        enclave_count = 0
+        
+        # Iterate through each cell in the grid
+        for i in range(rows):
+            for j in range(cols):
+                # Check if the cell is land and on the boundary
+                if grid[i][j] and (i == 0 or i == rows - 1 or j == 0 or j == cols - 1):
+                    boundary.append([i, j])
+                # Check if the cell is land and not on the boundary
+                if grid[i][j] and 0 < i < rows - 1 and 0 < j < cols - 1:
+                    enclave_count += 1
+        
+        # Process the boundary points using a breadth-first search
+        while boundary:
+            x, y = boundary.popleft()
+            if grid[x][y]:
+                # Mark the current cell as visited
+                grid[x][y] = 0
+                
+                # If the cell is not on the inner boundary, decrement the enclave count
+                if 0 < x < rows - 1 and 0 < y < cols - 1:
+                    enclave_count -= 1
+                
+                # Check neighboring cells and add valid ones to the boundary
+                for dx, dy in neighbors:
+                    nx, ny = x + dx, y + dy
+                    if -1 < nx < rows and -1 < ny < cols and grid[nx][ny]:
+                        boundary.append([nx, ny])
+        
+        # Return the count of enclaves
+        return enclave_count
